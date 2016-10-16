@@ -3,7 +3,7 @@ import boto.ec2
 from frigga_snake.ami import AMIName
 import sys
 
-if len(sys.argv) > 1:
+if not len(sys.argv) > 1:
     print("Provide AWS Account numbers as args")
     exit(1)
 
