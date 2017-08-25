@@ -23,8 +23,11 @@ for image in images:
         print image.name, image.description, image.tags
 
 for group, items in groups.items():
-    print group, len(items)
-    sorted_items = sorted(items, key=lambda key: int(AMIName(key.name, key.description, key.tags['appversion']).build_number.replace("h", "")))
-    for img in sorted_items[:-5]:
-        img.deregister(delete_snapshot=True)
-        time.sleep(0.1)
+    try:
+        print group, len(items)
+        sorted_items = sorted(items, key=lambda key: int(AMIName(key.name, key.description, key.tags['appversion']).build_number.replace("h", "")))
+        for img in sorted_items[:-2]:
+            img.deregister(delete_snapshot=True)
+            time.sleep(0.1)
+    except Exception as e:
+        print e
