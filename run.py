@@ -4,17 +4,22 @@ from frigga_snake.ami import AMIName
 import sys
 
 
+NUMBER_OF_IMAGES_TO_KEEP = 10
+
 # provide these for the account you want to use
 AWS_ACCESS_KEY_ID = ""
 AWS_SECRET_ACCESS_KEY = ""
+ACCOUNT_ID = None
 
 
-if not len(sys.argv) > 1:
-    print("Provide AWS Account numbers as args")
-    exit(1)
+if not ACCOUNT_ID:
+    if not len(sys.argv) > 1:
+        print("Provide AWS Account ID as args")
+        exit(1)
+    ACCOUNT_ID = sys.argv[1:]
 
 conn_eu = boto.ec2.connect_to_region('eu-west-1', aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-images = conn_eu.get_all_images(owners=sys.argv[1:])
+images = conn_eu.get_all_images(owners=ACCOUNT_ID)
 
 groups = {}
 images_with_missing_appversion = []
@@ -49,7 +54,7 @@ for group, items in groups.items():
     print group, len(items)
 
 print ''
-if raw_input('Are you sure you want to delete all but the last 5 of these images? Y/N: ').lower() == 'y':
+if raw_input('Are you sure you want to delete all but the last {} of these images? Y/N: '.format(NUMBER_OF_IMAGES_TO_KEEP)).lower() == 'y':
     for group, items in groups.items():
         try:
             print ''
@@ -57,7 +62,7 @@ if raw_input('Are you sure you want to delete all but the last 5 of these images
             print 'GROUP:', group, len(items)
             print '================='
             sorted_items = sorted(items, key=lambda key: int(AMIName(key.name, key.description, key.tags['appversion']).build_number.replace("h", "")))
-            for img in sorted_items[:-5]:
+            for img in sorted_items[:-NUMBER_OF_IMAGES_TO_KEEP]:
                 print 'deleting', img
                 img.deregister(delete_snapshot=True)
                 time.sleep(0.1)
