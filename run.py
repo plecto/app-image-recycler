@@ -63,24 +63,24 @@ for group, items in groups.items():
 print ''
 if raw_input('Are you sure you want to delete all but the last {} of these images? Y/N: '.format(NUMBER_OF_IMAGES_TO_KEEP)).lower() == 'y':
     for group, items in groups.items():
-        try:
-            print ''
-            print '================='
-            print 'GROUP:', group, len(items)
-            print '================='
-            sorted_items = sorted(items, key=lambda key: int(AMIName(key.name, key.description, key.tags['appversion']).build_number.replace("h", "")))
-            for img in sorted_items[:-NUMBER_OF_IMAGES_TO_KEEP]:
-                print 'deleting', img, AMIName(img.name, img.description, img.tags['appversion']).build_number.replace("h", "")
+        print ''
+        print '================='
+        print 'GROUP:', group, len(items)
+        print '================='
+        sorted_items = sorted(items, key=lambda key: int(AMIName(key.name, key.description, key.tags['appversion']).build_number.replace("h", "")))
+        for img in sorted_items[:-NUMBER_OF_IMAGES_TO_KEEP]:
+            print 'deleting', img, AMIName(img.name, img.description, img.tags['appversion']).build_number.replace("h", "")
+            try:
                 img.deregister(delete_snapshot=True)
-                time.sleep(0.1)
-            print ''
-        except Exception as e:
-            print ''
-            print '================='
-            print 'EXCEPTION:'
-            print '================='
-            print e
-            print ''
+            except Exception as e:
+                print ''
+                print '================='
+                print 'EXCEPTION:'
+                print '================='
+                print e
+                print ''
+            time.sleep(0.1)
+        print ''
 else:
     print 'Cancelled.'
 
