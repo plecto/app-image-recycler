@@ -34,54 +34,58 @@ for image in images:
     else:
         images_with_missing_appversion.append(image)
 
-print ''
-print ''
+print('')
+print('')
 
 if len(images_with_missing_appversion):
     for img in images_with_missing_appversion:
-        print img, img.name, img.description, img.tags
-    print ''
-    if raw_input('These images do not have an appversion. Do you want to delete them? Y/N: ').lower() == 'y':
+        print(img, img.name, img.description, img.tags)
+    print('')
+    if input('These images do not have an appversion. Do you want to delete them? Y/N: ').lower() == 'y':
         for img in images_with_missing_appversion:
-            print 'deleting', img
+            print('deleting', img)
             img.deregister(delete_snapshot=True)
             time.sleep(0.1)
 
-print ''
-print ''
+print('')
+print('')
 
 for group, items in groups.items():
-    print ''
-    print '================='
-    print 'GROUP:', group, len(items)
-    print '================='
+    if group != 'livestats':
+        continue
+    print('')
+    print('=================')
+    print('GROUP:', group, len(items))
+    print('=================')
     sorted_items = sorted(items, key=lambda key: int(AMIName(key.name, key.description, key.tags['appversion']).build_number.replace("h", "")))
     for img in sorted_items:
-        print img, AMIName(img.name, img.description, img.tags['appversion']).build_number.replace("h", "")
-    print ''
+        print(img, AMIName(img.name, img.description, img.tags['appversion']).build_number.replace("h", ""))
+    print('')
 
-print ''
-if raw_input('Are you sure you want to delete all but the last {} of these images? Y/N: '.format(NUMBER_OF_IMAGES_TO_KEEP)).lower() == 'y':
+print('')
+if input('Are you sure you want to delete all but the last {} of these images? Y/N: '.format(NUMBER_OF_IMAGES_TO_KEEP)).lower() == 'y':
     for group, items in groups.items():
-        print ''
-        print '================='
-        print 'GROUP:', group, len(items)
-        print '================='
+        if group != 'livestats':
+            continue
+        print('')
+        print('=================')
+        print('GROUP:', group, len(items))
+        print('=================')
         sorted_items = sorted(items, key=lambda key: int(AMIName(key.name, key.description, key.tags['appversion']).build_number.replace("h", "")))
         for img in sorted_items[:-NUMBER_OF_IMAGES_TO_KEEP]:
-            print 'deleting', img, AMIName(img.name, img.description, img.tags['appversion']).build_number.replace("h", "")
+            print('deleting', img, AMIName(img.name, img.description, img.tags['appversion']).build_number.replace("h", ""))
             try:
                 img.deregister(delete_snapshot=True)
             except Exception as e:
-                print ''
-                print '================='
-                print 'EXCEPTION:'
-                print '================='
-                print e
-                print ''
+                print('')
+                print('=================')
+                print('EXCEPTION:')
+                print('=================')
+                print(e)
+                print('')
             time.sleep(0.1)
-        print ''
+        print('')
 else:
-    print 'Cancelled.'
+    print('Cancelled.')
 
-print 'Done.'
+print('Done.')
