@@ -27,7 +27,7 @@ images_with_missing_appversion = []
 for image in images:
     if image.tags.get('appversion'):
         ami = AMIName(image.name, image.description, image.tags.get('appversion'))
-        if ami.build_number:
+        if ami and hasattr(ami, 'build_number') and ami.build_number:
             if ami.package_name not in groups:
                 groups[ami.package_name] = []
             groups[ami.package_name].append(image)
